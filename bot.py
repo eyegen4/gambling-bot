@@ -42,25 +42,25 @@ def update_user_data(user_id, updates):
 
 @bot.event
 async def on_ready():
-    print(f'{bot.user} is online!')
+    print(f'Biscoff\'s Dice is online!')
 
 @bot.command(name='tutorial')
 async def tutorial(ctx):
-    await ctx.send()
-        f'{ctx.author.mention}, welcome to Biscoff's Dice!\n'
+    await ctx.send(
+        f'{ctx.author.mention}, welcome to Biscoff\'s Dice!\n'
         '🎲 **How to Play**:\n'
         '- `!balance`: Check your Coins.\n'
         '- `!daily`: Get 50 Coins every 24 hours.\n'
         '- `!beg`: Beg for 5-15 Coins (1-min cooldown).\n'
         '- `!roll <amount>`: Bet Coins, roll a dice (1-6). Roll 2-6 to win double your bet; roll 1 to lose.\n'
         '- `!leaderboard`: See top 5 richest players.\n'
-        'Start with 100 Coins. Have fun and gamble responsibly!'
+        'Start with 100 Coins. Roll the dice and get rich!'
     )
 
 @bot.command(name='balance')
 async def balance(ctx):
     user_data = get_user_data(ctx.author.id)
-    await ctx.send(f'{ctx.author.mention}, you have **{user_data["balance"]} Coins**!')
+    await ctx.send(f'{ctx.author.mention}, you have **{user_data["balance"]} Coins** in Biscoff\'s Dice!')
 
 @bot.command(name='daily')
 async def daily(ctx):
@@ -69,12 +69,12 @@ async def daily(ctx):
     if user_data['last_daily']:
         last = datetime.fromisoformat(user_data['last_daily'])
         if now - last < timedelta(hours=24):
-            await ctx.send(f'{ctx.author.mention}, come back in {24 - (now - last).seconds // 3600} hours for daily!')
+            await ctx.send(f'{ctx.author.mention}, come back in {24 - (now - last).seconds // 3600} hours for Biscoff\'s daily reward!')
             return
     user_data['balance'] += 50
     user_data['last_daily'] = now.isoformat()
     update_user_data(ctx.author.id, {'balance': user_data['balance'], 'last_daily': user_data['last_daily']})
-    await ctx.send(f'{ctx.author.mention}, claimed **50 Coins**! Total: {user_data["balance"]}')
+    await ctx.send(f'{ctx.author.mention}, claimed **50 Coins** from Biscoff\'s Dice! Total: {user_data["balance"]}')
 
 @bot.command(name='beg')
 async def beg(ctx):
@@ -83,43 +83,43 @@ async def beg(ctx):
     if user_data['last_beg']:
         last = datetime.fromisoformat(user_data['last_beg'])
         if now - last < timedelta(minutes=1):
-            await ctx.send(f'{ctx.author.mention}, wait {(60 - (now - last).seconds) // 60 + 1} minutes to beg again.')
+            await ctx.send(f'{ctx.author.mention}, wait {(60 - (now - last).seconds) // 60 + 1} minutes to beg Biscoff again.')
             return
     coins = random.randint(5, 15)
     user_data['balance'] += coins
     user_data['last_beg'] = now.isoformat()
     update_user_data(ctx.author.id, {'balance': user_data['balance'], 'last_beg': user_data['last_beg']})
-    await ctx.send(f'{ctx.author.mention}, got **{coins} Coins** from begging! Total: {user_data["balance"]}')
+    await ctx.send(f'{ctx.author.mention}, Biscoff tossed you **{coins} Coins**! Total: {user_data["balance"]}')
 
 @bot.command(name='roll')
 async def roll(ctx, bet: int):
     user_data = get_user_data(ctx.author.id)
     if bet <= 0:
-        await ctx.send(f'{ctx.author.mention}, bet something real.')
+        await ctx.send(f'{ctx.author.mention}, bet something real for Biscoff\'s Dice.')
         return
     if user_data['balance'] < bet:
-        await ctx.send(f'{ctx.author.mention}, you need {bet - user_data["balance"]} more Coins.')
+        await ctx.send(f'{ctx.author.mention}, you need {bet - user_data["balance"]} more Coins for Biscoff\'s Dice.')
         return
     dice = random.randint(1, 6)
     if dice == 1:
         user_data['balance'] -= bet
         update_user_data(ctx.author.id, {'balance': user_data['balance']})
-        await ctx.send(f'🎲 Rolled a {dice}! You lost {bet} Coins. Balance: {user_data["balance"]}')
+        await ctx.send(f'🎲 Biscoff\'s Dice rolled a {dice}! You lost {bet} Coins. Balance: {user_data["balance"]}')
     else:
         winnings = bet * 2
         user_data['balance'] += (winnings - bet)
         update_user_data(ctx.author.id, {'balance': user_data['balance']})
-        await ctx.send(f'🎲 Rolled a {dice}! Won {winnings} Coins! Balance: {user_data["balance"]}')
+        await ctx.send(f'🎲 Biscoff\'s Dice rolled a {dice}! Won {winnings} Coins! Balance: {user_data["balance"]}')
 
 @bot.command(name='leaderboard')
 async def leaderboard(ctx):
     data = load_data()
     sorted_users = sorted(data.items(), key=lambda x: x[1]['balance'], reverse=True)[:5]
-    msg = '🏆 **Leaderboard (Top 5)** 🏆\n'
+    msg = '🏆 **Biscoff\'s Dice Leaderboard (Top 5)** 🏆\n'
     for i, (user_id, user_data) in enumerate(sorted_users, 1):
         user = await bot.fetch_user(int(user_id))
         msg += f'{i}. {user.name}: {user_data["balance"]} Coins\n'
-    await ctx.send(msg if sorted_users else 'No players yet! Start gambling!')
+    await ctx.send(msg if sorted_users else 'No players yet! Roll with Biscoff\'s Dice!')
 
 # Run bot with environment variable
 bot.run(os.getenv('DISCORD_TOKEN'))
