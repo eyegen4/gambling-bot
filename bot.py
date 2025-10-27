@@ -46,7 +46,7 @@ async def on_ready():
 
 @bot.command(name='tutorial')
 async def tutorial(ctx):
-    await ctx.send(
+    await ctx.send()
         f'{ctx.author.mention}, welcome to Biscoff's Dice!\n'
         '🎲 **How to Play**:\n'
         '- `!balance`: Check your Coins.\n'
