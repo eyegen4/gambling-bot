@@ -3,6 +3,7 @@ from discord.ext import commands
 import json
 import random
 import os
+import asyncio
 from datetime import datetime, timedelta
 
 # Bot setup
@@ -52,9 +53,9 @@ async def tutorial(ctx):
         '- `!balance`: Check your Coins.\n'
         '- `!daily`: Get 50 Coins every 24 hours.\n'
         '- `!beg`: Beg for 5-15 Coins (1-min cooldown).\n'
-        '- `!roll <amount>`: Bet Coins, roll a dice (1-6). Roll 4-6 to win 1.5x your bet; roll 1-3 to lose (30-sec cooldown).\n'
+        '- `!roll <amount>`: Bet Coins, roll a dice (1-6). Biscoff rolls for a moment, then: 4-6 wins 1.5x your bet, 1-3 loses (30-sec cooldown).\n'
         '- `!leaderboard`: See top 5 richest players.\n'
-        'Start with 100 Coins. Roll the dice and get rich!'
+        'Start with 100 Coins. Feel the thrill and roll the dice!'
     )
 
 @bot.command(name='balance')
@@ -109,6 +110,9 @@ async def roll(ctx, bet: int):
     if user_data['balance'] < bet:
         await ctx.send(f'{ctx.author.mention}, you need {bet - user_data["balance"]} more Coins for Biscoff\'s Dice.')
         return
+    # Simulate rolling
+    await ctx.send(f'{ctx.author.mention}, Biscoff is rolling the dice... 🎲')
+    await asyncio.sleep(2)  # 2-second delay for realism
     # Roll dice
     dice = random.randint(1, 6)
     if dice <= 3:  # Lose on 1-3 (50% chance)
