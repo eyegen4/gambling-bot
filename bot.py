@@ -47,8 +47,8 @@ async def on_ready():
 @bot.command(name='tutorial')
 async def tutorial(ctx):
     await ctx.send(
-        f'{ctx.author.mention}, welcome to SimpleGamblerBot!\n'
-        '🎲 **How to Play**:\n'
+        f'{ctx.author.mention}, welcome to Biscoff's Dice!\n'
+        ':rollingdice: **How to Play**:\n'
         '- `!balance`: Check your Coins.\n'
         '- `!daily`: Get 50 Coins every 24 hours.\n'
         '- `!beg`: Beg for 5-15 Coins (1-min cooldown).\n'
@@ -104,12 +104,12 @@ async def roll(ctx, bet: int):
     if dice == 1:
         user_data['balance'] -= bet
         update_user_data(ctx.author.id, {'balance': user_data['balance']})
-        await ctx.send(f'🎲 Rolled a {dice}! You lost {bet} Coins. Balance: {user_data["balance"]}')
+        await ctx.send(f':rollingdice: Rolled a {dice}! You lost {bet} Coins. Balance: {user_data["balance"]}')
     else:
         winnings = bet * 2
         user_data['balance'] += (winnings - bet)
         update_user_data(ctx.author.id, {'balance': user_data['balance']})
-        await ctx.send(f'🎲 Rolled a {dice}! Won {winnings} Coins! Balance: {user_data["balance"]}')
+        await ctx.send(f':rollingdice: Rolled a {dice}! Won {winnings} Coins! Balance: {user_data["balance"]}')
 
 @bot.command(name='leaderboard')
 async def leaderboard(ctx):
