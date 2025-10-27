@@ -5,6 +5,15 @@ import random
 import os
 import asyncio
 from datetime import datetime, timedelta
+from flask import Flask
+import threading
+
+# Flask app for Render's port requirement
+app = Flask(__name__)
+
+@app.route('/')
+def health_check():
+    return 'Biscoff\'s Dice is running!', 200
 
 # Bot setup
 intents = discord.Intents.default()
@@ -96,32 +105,28 @@ async def beg(ctx):
 async def roll(ctx, bet: int):
     user_data = get_user_data(ctx.author.id)
     now = datetime.now()
-    # Check cooldown
     if user_data['last_roll']:
         last = datetime.fromisoformat(user_data['last_roll'])
         if now - last < timedelta(seconds=30):
             remaining = 30 - (now - last).seconds
             await ctx.send(f'{ctx.author.mention}, slow down! Wait {remaining} seconds to roll Biscoff\'s Dice again.')
             return
-    # Validate bet
     if bet <= 0:
         await ctx.send(f'{ctx.author.mention}, bet something real for Biscoff\'s Dice.')
         return
     if user_data['balance'] < bet:
         await ctx.send(f'{ctx.author.mention}, you need {bet - user_data["balance"]} more Coins for Biscoff\'s Dice.')
         return
-    # Simulate rolling
     await ctx.send(f'{ctx.author.mention}, Biscoff is rolling the dice... 🎲')
-    await asyncio.sleep(2)  # 2-second delay for realism
-    # Roll dice
+    await asyncio.sleep(2)
     dice = random.randint(1, 6)
-    if dice <= 3:  # Lose on 1-3 (50% chance)
+    if dice <= 3:
         user_data['balance'] -= bet
         update_user_data(ctx.author.id, {'balance': user_data['balance'], 'last_roll': now.isoformat()})
         await ctx.send(f'{ctx.author.mention}, 🎲 Biscoff\'s Dice rolled a {dice}! You lost {bet} Coins. Balance: {user_data["balance"]}')
-    else:  # Win on 4-6 (50% chance)
-        winnings = int(bet * 1.5)  # 1.5x bet, rounded down
-        user_data['balance'] += (winnings - bet)  # Net gain
+    else:
+        winnings = int(bet * 1.5)
+        user_data['balance'] += (winnings - bet)
         update_user_data(ctx.author.id, {'balance': user_data['balance'], 'last_roll': now.isoformat()})
         await ctx.send(f'{ctx.author.mention}, 🎲 Biscoff\'s Dice rolled a {dice}! You won {winnings} Coins! Balance: {user_data["balance"]}')
 
@@ -135,5 +140,11 @@ async def leaderboard(ctx):
         msg += f'{i}. {user.name}: {user_data["balance"]} Coins\n'
     await ctx.send(msg if sorted_users else f'{ctx.author.mention}, no players yet! Roll with Biscoff\'s Dice!')
 
-# Run bot with environment variable
-bot.run(os.getenv('DISCORD_TOKEN'))
+# Run Flask and Discord bot concurrently
+def run_flask():
+    port = int(os.getenv('PORT', 10000))
+    app.run(host='0.0.0.0', port=port)
+
+if __name__ == '__main__':
+    threading.Thread(target=run_flask, daemon=True).start()
+    bot.run(os.getenv('DISCORD_TOKEN'))
